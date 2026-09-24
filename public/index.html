@@ -1,0 +1,285 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no">
+<title>SECRET MAZE — Ultimate Adventure</title>
+<style>
+:root{--bg:#030914;--panel:#091827;--panel2:#0d2236;--line:#1f4765;--accent:#35d8ff;--gold:#ffd84a;--danger:#ff5d67;--good:#42ed83;--text:#f4fbff;--muted:#9db7c9}
+*{box-sizing:border-box;-webkit-tap-highlight-color:transparent}html,body{margin:0;min-height:100%;background:radial-gradient(circle at 50% -10%,#163c5a 0,#071421 43%,#02050b 100%);color:var(--text);font-family:Inter,Segoe UI,Arial,sans-serif}button{font:inherit}.app{width:min(1500px,100%);margin:auto;padding:14px}.hidden{display:none!important}
+.header{display:grid;grid-template-columns:1.4fr 2fr auto;gap:12px;align-items:center;margin-bottom:12px}.brand,.stat,.panel{background:linear-gradient(145deg,rgba(13,34,54,.98),rgba(5,15,26,.98));border:1px solid var(--line);box-shadow:0 14px 40px #0007}.brand{border-radius:18px;padding:15px 18px}.brand h1{margin:0;font-size:clamp(22px,3vw,34px)}.brand h1 span{color:var(--accent)}.brand p{margin:5px 0 0;color:var(--muted);font-size:13px}.stats{display:grid;grid-template-columns:repeat(6,1fr);gap:8px}.stat{border-radius:14px;padding:9px;text-align:center;min-width:0}.stat span{display:block;color:var(--muted);font-size:12px}.stat b{display:block;font-size:18px;margin-top:3px}.header-actions{display:flex;gap:8px}.btn{border:1px solid #2d6386;background:#12334c;color:#fff;border-radius:12px;padding:12px 14px;font-weight:800;cursor:pointer}.btn.primary{background:var(--accent);color:#03202b;border-color:#73e8ff}.btn:hover{filter:brightness(1.1)}
+.layout{display:grid;grid-template-columns:minmax(0,1fr) 330px;gap:14px}.panel{border-radius:20px;padding:14px}.game-panel{min-width:0}.message{text-align:center;min-height:32px;color:#ffe58a;font-weight:800;padding:4px 6px}.bar{height:9px;background:#102b40;border-radius:99px;overflow:hidden;margin:5px 0 12px}.bar i{display:block;height:100%;width:100%;background:var(--accent);transition:width .15s}
+#maze{position:relative;width:min(820px,100%);aspect-ratio:1;margin:auto;overflow:hidden;border:7px solid #182b3d;border-radius:18px;background:#d8b26c;box-shadow:inset 0 0 45px #0009,0 18px 45px #000b;touch-action:none}.cell{position:absolute}.wall{background:linear-gradient(145deg,#5bb85c,#236f36);border:1px solid #145326;box-shadow:inset 0 2px 0 #9be58b,inset 0 -5px 8px #0b421e}.floor{background:linear-gradient(145deg,#e8c985,#b9834c)}.secret-wall{cursor:pointer}.secret-wall:after{content:'✦';position:absolute;inset:0;display:grid;place-items:center;color:#ffe66a;opacity:.28;font-size:14px}.secret-open{background:linear-gradient(145deg,#f3d89a,#c89552)!important;box-shadow:inset 0 0 0 2px #ffd64d,0 0 14px #ffd34d88}.item{position:absolute;z-index:5;display:grid;place-items:center;font-size:clamp(16px,3vw,30px);pointer-events:none}.coin{filter:drop-shadow(0 0 7px #ffd34d);animation:coin .8s infinite alternate}.key{filter:drop-shadow(0 0 8px #fff36a)}.trap.active{animation:trap .2s infinite alternate}.enemy{z-index:6;transition:left .32s linear,top .32s linear;filter:drop-shadow(0 0 8px #ff4b59)}#goal,#player{position:absolute;z-index:8;display:grid;place-items:center}.goal{font-size:clamp(18px,4vw,38px);filter:drop-shadow(0 0 10px #ffd600);animation:goal 1s infinite alternate}.goal.locked{filter:grayscale(.8) drop-shadow(0 0 7px #aaa)}.goal.unlocked{filter:drop-shadow(0 0 12px #39f59a);animation:unlock .35s infinite alternate}.hint-dot{position:absolute;z-index:7;width:22%;height:22%;margin:-11% 0 0 -11%;border-radius:50%;background:#35d8ff;box-shadow:0 0 12px #35d8ff;opacity:.85;pointer-events:none;animation:hintPulse .65s infinite alternate}@keyframes hintPulse{to{transform:scale(.65);opacity:.35}}.carried-key{position:absolute;right:3%;top:8%;font-size:clamp(12px,2.2vw,24px);filter:drop-shadow(0 0 7px #fff36a);animation:keybob .55s infinite alternate;pointer-events:none}@keyframes unlock{to{transform:scale(1.2) rotate(4deg)}}@keyframes keybob{to{transform:translateY(-3px) rotate(8deg)}}
+@keyframes coin{to{transform:scale(.72) rotateY(70deg)}}@keyframes trap{to{transform:scale(1.2)}}@keyframes goal{to{transform:scale(1.12)}}
+#player{z-index:9;transition:left .12s linear,top .12s linear}.player-safe{animation:safeFlash .18s infinite alternate;filter:drop-shadow(0 0 10px #42ed83)}@keyframes safeFlash{to{opacity:.45}}.player-svg{width:100%;height:100%}.head{fill:#efb28a}.hair{fill:#342118}.shirt{fill:#e72e38}.pants{fill:#27396b}.shoe{fill:#f4f4f4}.limb{stroke:#efb28a;stroke-width:8;stroke-linecap:round}.leg{stroke:#27396b}.walking .armL{animation:a1 .12s infinite alternate}.walking .armR{animation:a2 .12s infinite alternate}.walking .legL{animation:a2 .12s infinite alternate}.walking .legR{animation:a1 .12s infinite alternate}@keyframes a1{to{transform:rotate(22deg)}}@keyframes a2{to{transform:rotate(-22deg)}}
+.fog{position:absolute;z-index:20;inset:0;pointer-events:none;background:radial-gradient(circle at var(--fx) var(--fy),transparent 0,transparent 13%,rgba(1,5,10,.18) 20%,rgba(1,5,10,.65) 32%,rgba(1,5,10,.95) 48%);transition:background .1s}.side h2{font-size:18px;margin:4px 0 9px}.mission{background:#102d46;border:1px solid #214d6b;border-radius:12px;padding:10px;color:#d7efff;line-height:1.45}.levels{display:grid;grid-template-columns:repeat(4,1fr);gap:7px}.level-btn{height:42px;border:1px solid #2a5775;border-radius:10px;background:#12344d;color:#fff;font-weight:800;cursor:pointer}.level-btn.locked{opacity:.3;cursor:not-allowed}.level-btn.current{background:var(--accent);color:#03202b}.small{font-size:12px;color:var(--muted);line-height:1.5}.controls{width:220px;height:210px;margin:14px auto 6px;display:grid;grid-template-columns:repeat(3,1fr);grid-template-rows:repeat(3,1fr);gap:7px}.control{border:1px solid #2d6386;background:#12334c;color:#fff;border-radius:16px;font-size:27px;cursor:pointer;touch-action:manipulation}.control:active{transform:scale(.94)}.up{grid-column:2}.left{grid-column:1;grid-row:2}.center{grid-column:2;grid-row:2;display:grid;place-items:center;color:#76a8c2;font-size:11px}.right{grid-column:3;grid-row:2}.down{grid-column:2;grid-row:3}.action-row{display:grid;grid-template-columns:1fr 1fr;gap:8px}.screen{max-width:900px;margin:40px auto;text-align:center;padding:32px}.screen h1{font-size:clamp(28px,5vw,48px);margin:0 0 10px}.feature-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:8px;margin:20px 0}.feature{background:#102b42;border:1px solid #214c68;border-radius:12px;padding:12px;font-size:13px}.code{font-family:Consolas,monospace;color:var(--gold);font-size:clamp(20px,4vw,34px);font-weight:900;word-break:break-word;padding:18px;border:2px solid #766500;border-radius:14px;background:#08121b;margin:18px 0}.overlay{position:fixed;inset:0;background:#000b;z-index:100;display:grid;place-items:center;padding:18px}.modal{width:min(560px,100%);background:linear-gradient(145deg,#102a43,#050d17);border:1px solid #2e6b92;border-radius:20px;padding:28px;text-align:center;box-shadow:0 30px 80px #000c}.modal h2{margin-top:0;color:var(--gold)}
+@media(max-width:1050px){.header{grid-template-columns:1fr}.header-actions{justify-content:flex-end}.stats{grid-template-columns:repeat(6,1fr)}}@media(max-width:800px){.layout{grid-template-columns:1fr}.side{order:2}.feature-grid{grid-template-columns:repeat(2,1fr)}.stats{grid-template-columns:repeat(3,1fr)}}@media(max-width:450px){.app{padding:7px}.panel{padding:9px}.stats{grid-template-columns:repeat(2,1fr)}.action-row{grid-template-columns:1fr}.controls{width:205px}}
+</style>
+</head>
+<body>
+<div class="app">
+<header class="header">
+ <div class="brand"><h1>🧩 SECRET <span>MAZE</span></h1><p>Ultimate Adventure • 12 handcrafted difficulty stages</p></div>
+ <div class="stats">
+  <div class="stat"><span>LEVEL</span><b id="levelText">1</b></div><div class="stat"><span>❤️ LIVES</span><b id="livesText">3</b></div><div class="stat"><span>👣 MOVES</span><b id="movesText">0</b></div><div class="stat"><span>⏱️ TIME</span><b id="timeText">0.0</b></div><div class="stat"><span>🪙 COINS</span><b id="coinsText">0</b></div><div class="stat"><span>🏆 SCORE</span><b id="scoreText">0</b></div>
+ </div>
+ <div class="header-actions"><button class="btn" id="restartBtn">↻ Restart</button><button class="btn" id="homeBtn">⌂ Home</button></div>
+</header>
+
+<section id="home" class="panel screen">
+ <h1>Ready for the maze?</h1><p>Every level is generated differently, but every maze has a guaranteed route to the exit.</p>
+ <div class="feature-grid"><div class="feature">🪙 Coins + combo</div><div class="feature">🔑 Keys + locked exits</div><div class="feature">💣 Traps + enemies</div><div class="feature">🌫️ Fog + secrets</div></div>
+ <button class="btn primary" id="playBtn">▶ PLAY LEVEL 1</button>
+ <h2 style="margin-top:28px">Level Select</h2><div class="levels" id="levels"></div>
+ <p>🪙 Coins: <b id="homeCoins">0</b> &nbsp; 🏆 Score: <b id="homeScore">0</b></p>
+ <p class="small">You have 3 lives. Three wall/trap/enemy hits restart the adventure at Level 1. The level itself remains playable after every mistake.</p>
+</section>
+
+<section id="game" class="hidden">
+ <div class="layout"><main class="panel game-panel">
+  <div class="message" id="message">Find the exit.</div><div class="bar"><i id="timeBar"></i></div>
+  <div id="maze"><div id="goal" class="goal">🏁</div><div id="player"></div><div id="fog" class="fog hidden"></div></div>
+  <div class="controls"><button class="control up" data-move="up">⬆️</button><button class="control left" data-move="left">⬅️</button><div class="center">WASD<br>ARROWS</div><button class="control right" data-move="right">➡️</button><button class="control down" data-move="down">⬇️</button></div>
+  <div class="action-row"><button class="btn" id="restartBtn2">↻ Restart Level</button><button class="btn" id="hintBtn">🧭 Hint</button><button class="btn" id="pauseBtn">Ⅱ Pause</button></div>
+ </main>
+ <aside class="panel side"><h2>🎯 Mission</h2><div class="mission" id="missionText"></div><h2 style="margin-top:16px">📈 Run</h2><p>Combo: <b id="comboText">x1</b></p><p>Best time: <b id="bestText">—</b></p><p>Best score: <b id="bestScoreText">—</b></p><h2 style="margin-top:16px">🧩 Levels</h2><div class="levels" id="levels2"></div><p class="small" style="margin-top:14px">Blue player = start. Yellow/🏁 = real exit. Red/purple enemies patrol side corridors. Traps are placed away from the guaranteed main route whenever possible.</p></aside></div>
+</section>
+
+<section id="complete" class="panel screen hidden"><h1>🎉 LEVEL CLEARED!</h1><p id="completeSummary"></p><p>Your secure phrase code:</p><div class="code" id="phrase">Loading…</div><p>Time: <b id="completeTime"></b> • Score gained: <b id="completeScore"></b></p><button class="btn primary" id="nextBtn">➡️ NEXT LEVEL</button> <button class="btn" id="completeHomeBtn">⌂ HOME</button></section>
+<section id="final" class="panel screen hidden"><h1>🏆 MAZE CHAMPION</h1><p>You completed all 12 levels.</p><div class="code" id="finalCode">Loading…</div><p>Final score: <b id="finalScore"></b></p><button class="btn" id="finalHomeBtn">⌂ HOME</button></section>
+</div>
+
+<div id="pauseOverlay" class="overlay hidden"><div class="modal"><h2>⏸ Game Paused</h2><p>Your timer and enemies are paused.</p><button class="btn primary" id="resumeBtn">▶ Resume</button></div></div>
+<script>
+(function(){
+'use strict';
+const $=id=>document.getElementById(id);
+const LEVELS=Array.from({length:12},(_,i)=>({
+ name:["Green Garden","Key Keeper","Trap Temple","Ghost Patrol","Fog Forest","False Exit","Hidden Realm","Speed Run","Inferno Maze","Shadow Hunt","Master Lock","FINAL NIGHTMARE"][i],
+ size:21+i*2,
+ time:125-i*2,
+ coins:4+Math.floor(i*.7),
+ traps:i===0?1:2+i,
+ enemies:Math.min(5,Math.floor(i/2)),
+ key:true,
+ decoys:i>=3?Math.min(3,1+Math.floor((i-3)/3)):0,
+ fog:i===4?0:(i>=4?Math.min(4,2+Math.floor((i-4)/3)):0),
+ secrets:Math.min(5,1+Math.floor(i/2))
+}));
+const DEMO_PHRASES=["BLUE-FOX-17","MOON-STAR-42","GOLD-KEY-83","SECRET-DOOR-29","RED-LION-64","SHADOW-55","DIAMOND-71","NIGHT-88","MAGIC-34","ULTRA-92","MASTER-47","FINAL-2026"];
+let state={unlocked:Math.min(12,Math.max(1,Number(localStorage.getItem('mazeUnlocked')||1))),score:Number(localStorage.getItem('mazeScore')||0),coins:Number(localStorage.getItem('mazeCoins')||0),best:JSON.parse(localStorage.getItem('mazeBest')||'{}'),bestScore:JSON.parse(localStorage.getItem('mazeBestScore')||'{}')};
+let level=1,grid=[],path=[],x=1,y=1,goal={x:1,y:1},lives=3,moves=0,combo=1,seconds=0,paused=false,finished=false,hasKey=false,invulnerableUntil=0,timer=null,enemyTimer=null,items={coins:[],traps:[],enemies:[],decoys:[],secrets:new Set(),opened:new Set(),key:null};
+let completionChallenge=null,lastClaimedCode='';
+const els={home:$('home'),game:$('game'),complete:$('complete'),final:$('final'),maze:$('maze'),fog:$('fog')};
+function save(){localStorage.setItem('mazeUnlocked',state.unlocked);localStorage.setItem('mazeScore',state.score);localStorage.setItem('mazeCoins',state.coins);localStorage.setItem('mazeBest',JSON.stringify(state.best));localStorage.setItem('mazeBestScore',JSON.stringify(state.bestScore));}
+function show(id){[els.home,els.game,els.complete,els.final].forEach(e=>e.classList.add('hidden'));$(id).classList.remove('hidden')}
+function rng(seed){let s=seed>>>0;return()=>{s=(s*1664525+1013904223)>>>0;return s/4294967296}}
+function generateMaze(size,seed){
+ const r=rng(seed),g=Array.from({length:size},()=>Array(size).fill(1));
+ const stack=[[1,1]];g[1][1]=0;
+ while(stack.length){const [cx,cy]=stack[stack.length-1];const dirs=[[2,0],[-2,0],[0,2],[0,-2]];for(let i=dirs.length-1;i>0;i--){const j=Math.floor(r()*(i+1));[dirs[i],dirs[j]]=[dirs[j],dirs[i]]}let carved=false;for(const [dx,dy] of dirs){const nx=cx+dx,ny=cy+dy;if(nx>0&&ny>0&&nx<size-1&&ny<size-1&&g[ny][nx]===1){g[cy+dy/2][cx+dx/2]=0;g[ny][nx]=0;stack.push([nx,ny]);carved=true;break}}if(!carved)stack.pop()}
+ g[size-2][size-2]=0;return g;
+}
+function bfs(g){const q=[[1,1]],prev=new Map([['1,1',null]]),dirs=[[1,0],[-1,0],[0,1],[0,-1]];let end=null;while(q.length){const p=q.shift(),k=p[0]+','+p[1];if(p[0]===goal.x&&p[1]===goal.y){end=p;break}for(const [dx,dy] of dirs){const nx=p[0]+dx,ny=p[1]+dy,nk=nx+','+ny;if(nx>=0&&ny>=0&&ny<g.length&&nx<g[0].length&&g[ny][nx]===0&&!prev.has(nk)){prev.set(nk,p);q.push([nx,ny])}}}if(!end)return[];const out=[];let cur=end;while(cur){out.push({x:cur[0],y:cur[1]});cur=prev.get(cur[0]+','+cur[1])}return out.reverse()}
+function floorCells(){const a=[];for(let yy=1;yy<grid.length-1;yy++)for(let xx=1;xx<grid.length-1;xx++)if(grid[yy][xx]===0&&!(xx===1&&yy===1)&&!(xx===goal.x&&yy===goal.y))a.push({x:xx,y:yy});return a}
+function dist(a,b){return Math.abs(a.x-b.x)+Math.abs(a.y-b.y)}
+function pick(cells,n,avoid,r){const copy=cells.filter(p=>!avoid.has(p.x+','+p.y));for(let i=copy.length-1;i>0;i--){const j=Math.floor(r()*(i+1));[copy[i],copy[j]]=[copy[j],copy[i]]}const out=[];for(const p of copy){if(out.length>=n)break;out.push(p);avoid.add(p.x+','+p.y)}return out}
+function renderPlayer(){const p=$('player');p.innerHTML='<svg class="player-svg" viewBox="0 0 100 125"><circle class="head" cx="50" cy="26" r="18"/><path class="hair" d="M31 24Q36 3 53 6Q69 8 71 25Q62 16 52 18Q41 15 31 24Z"/><circle cx="44" cy="27" r="2" fill="#17202a"/><circle cx="57" cy="27" r="2" fill="#17202a"/><path d="M45 34Q50 38 55 34" fill="none" stroke="#7b4637" stroke-width="2"/><path class="shirt" d="M29 49Q50 38 71 49L78 88H22Z"/><line class="limb armL" x1="29" y1="53" x2="14" y2="76"/><line class="limb armR" x1="71" y1="53" x2="86" y2="76"/><line class="limb leg legL" x1="39" y1="87" x2="32" y2="111"/><line class="limb leg legR" x1="61" y1="87" x2="68" y2="111"/><path class="shoe" d="M28 108Q38 107 44 112V117H24Q22 112 28 108Z"/><path class="shoe" d="M56 112Q64 107 73 109Q79 112 76 117H55Z"/></svg>'+ (hasKey ? '<span class="carried-key">🔑</span>' : '');
+ const s=grid.length;p.style.width=100/s+'%';p.style.height=100/s+'%';p.style.left=x*100/s+'%';p.style.top=y*100/s+'%';
+}
+function cellEl(cls,p,icon){const d=document.createElement('div');d.className='item '+cls;d.textContent=icon;d.dataset.x=p.x;d.dataset.y=p.y;d.style.width=100/grid.length+'%';d.style.height=100/grid.length+'%';d.style.left=p.x*100/grid.length+'%';d.style.top=p.y*100/grid.length+'%';els.maze.appendChild(d);return d}
+async function startLevelChallenge(){
+  completionChallenge=null;
+  try{
+    const res=await fetch('/api/start/'+encodeURIComponent(level),{cache:'no-store'});
+    if(!res.ok)throw new Error('challenge unavailable');
+    const data=await res.json();
+    if(!data.success||!data.challengeId)throw new Error('invalid challenge');
+    completionChallenge={id:data.challengeId};
+  }catch(err){
+    console.error(err);
+    $('message').textContent='⚠️ Secure connection unavailable. Restart the level.';
+  }
+}
+
+async function claimPhrase(){
+  if(!completionChallenge)throw new Error('No completion challenge');
+  const res=await fetch('/api/complete',{
+    method:'POST',
+    headers:{'Content-Type':'application/json'},
+    cache:'no-store',
+    body:JSON.stringify({challengeId:completionChallenge.id,level,seconds:Number(seconds.toFixed(1)),moves})
+  });
+  if(!res.ok){
+    let msg='secure code claim failed';
+    try{const e=await res.json();if(e&&e.error)msg=e.error}catch(_){ }
+    throw new Error(msg);
+  }
+  const data=await res.json();
+  if(!data.success||!data.code)throw new Error('No secure code');
+  completionChallenge=null;
+  lastClaimedCode=data.code;
+  return data.code;
+}
+
+function buildLevel(){
+ clearInterval(timer);clearInterval(enemyTimer);finished=false;paused=false;hasKey=false;invulnerableUntil=0;combo=1;moves=0;seconds=0;lives=3;
+ const cfg=LEVELS[level-1],size=cfg.size;grid=generateMaze(size,level*9187+77);goal={x:size-2,y:size-2};path=bfs(grid);if(!path.length){grid=generateMaze(size,level*9187+999);path=bfs(grid)}
+ x=1;y=1;const r=rng(level*7741+31),avoid=new Set(['1,1',goal.x+','+goal.y]);
+ items={coins:[],traps:[],enemies:[],decoys:[],secrets:new Set(),opened:new Set(),key:null};
+ // Secret doors are side walls; opening them adds optional shortcuts, never removes the guaranteed main route.
+ const sideWalls=[];for(let yy=1;yy<size-1;yy++)for(let xx=1;xx<size-1;xx++)if(grid[yy][xx]===1){const vertical=grid[yy-1][xx]===0&&grid[yy+1][xx]===0,horizontal=grid[yy][xx-1]===0&&grid[yy][xx+1]===0;if(vertical||horizontal)sideWalls.push({x:xx,y:yy})}
+ for(let i=0;i<Math.min(cfg.secrets,sideWalls.length);i++){const p=sideWalls[Math.floor(r()*sideWalls.length)];const k=p.x+','+p.y;if(!items.secrets.has(k)){items.secrets.add(k)}}
+ if(cfg.key){const k=path[Math.max(3,Math.floor(path.length*.48))];items.key={x:k.x,y:k.y};avoid.add(k.x+','+k.y)}
+ // Keep hazards off the guaranteed route so the player can always finish if they follow it.
+ const pathSet=new Set(path.map(p=>p.x+','+p.y));
+ let candidates=floorCells().filter(p=>!avoid.has(p.x+','+p.y)&&!pathSet.has(p.x+','+p.y)&&dist(p,{x:1,y:1})>5);items.traps=pick(candidates,cfg.traps,avoid,r);
+ let coinCandidates=floorCells().filter(p=>!avoid.has(p.x+','+p.y)&&!pathSet.has(p.x+','+p.y));items.coins=pick(coinCandidates,cfg.coins,avoid,r);
+ let decCandidates=floorCells().filter(p=>!avoid.has(p.x+','+p.y)&&!pathSet.has(p.x+','+p.y));items.decoys=pick(decCandidates,cfg.decoys,avoid,r);
+ // Patrol enemies only use safe side corridors, never the guaranteed route.
+ for(let i=0;i<cfg.enemies;i++){let candidates=floorCells().filter(p=>!pathSet.has(p.x+','+p.y)&&dist(p,{x:1,y:1})>6);if(!candidates.length)break;let seed=candidates[Math.floor(r()*candidates.length)],route=[seed];let cur=seed;for(let step=0;step<5;step++){const opts=[[1,0],[-1,0],[0,1],[0,-1]].map(([dx,dy])=>({x:cur.x+dx,y:cur.y+dy})).filter(p=>p.x>0&&p.y>0&&p.x<size-1&&p.y<size-1&&grid[p.y][p.x]===0&&!pathSet.has(p.x+','+p.y));if(!opts.length)break;cur=opts[Math.floor(r()*opts.length)];route.push(cur)}if(route.length>=3)items.enemies.push({path:route,pos:0,dir:1})}
+ els.maze.querySelectorAll('.cell,.item').forEach(e=>e.remove());
+ for(let yy=0;yy<size;yy++)for(let xx=0;xx<size;xx++){const d=document.createElement('div');const k=xx+','+yy;d.className='cell '+(grid[yy][xx]?'wall':'floor');d.dataset.x=xx;d.dataset.y=yy;d.style.width=100/size+'%';d.style.height=100/size+'%';d.style.left=xx*100/size+'%';d.style.top=yy*100/size+'%';if(items.secrets.has(k))d.classList.add('secret-wall');els.maze.appendChild(d)}
+ if(items.key)cellEl('key',items.key,'🔑');items.coins.forEach(p=>cellEl('coin',p,'🪙'));items.traps.forEach((p,i)=>cellEl('trap',p,['💣','🔥','⚡','🕳️','☠️'][i%5]));items.decoys.forEach(p=>cellEl('exit',p,'🚪'));
+ $('goal').style.width=100/size+'%';$('goal').style.height=100/size+'%';$('goal').style.left=goal.x*100/size+'%';$('goal').style.top=goal.y*100/size+'%';$('goal').textContent='🔒';$('goal').classList.add('locked');$('goal').classList.remove('unlocked');
+ renderEnemies();renderPlayer();updateFog();updateStats();updateBest();$('message').textContent=mission(level);startClock();startEnemies();startLevelChallenge();
+}
+function clearHint(){els.maze.querySelectorAll(".hint-dot").forEach(e=>e.remove());}
+function showHint(){
+ if(finished||paused)return;
+ clearHint();
+ const target=hasKey?goal:items.key;
+ if(!target)return;
+ const start={x,y};
+ const q=[start],prev=new Map([[start.x+","+start.y,null]]),dirs=[[1,0],[-1,0],[0,1],[0,-1]];
+ let found=null;
+ while(q.length){
+  const cur=q.shift();
+  if(cur.x===target.x&&cur.y===target.y){found=cur;break;}
+  for(const [dx,dy] of dirs){
+   const nx=cur.x+dx,ny=cur.y+dy,k=nx+","+ny;
+   if(nx<0||ny<0||ny>=grid.length||nx>=grid.length||grid[ny][nx]!==0||prev.has(k))continue;
+   prev.set(k,cur);q.push({x:nx,y:ny});
+  }
+ }
+ if(!found){$("message").textContent="No route found — restart this level.";return;}
+ const route=[];let cur=found;
+ while(cur){route.push(cur);cur=prev.get(cur.x+","+cur.y);}
+ route.reverse();
+ route.slice(1,14).forEach(pt=>{
+  const d=document.createElement("div");d.className="hint-dot";
+  d.style.left=(pt.x+0.5)*100/grid.length+"%";d.style.top=(pt.y+0.5)*100/grid.length+"%";
+  els.maze.appendChild(d);
+ });
+ $("message").textContent=hasKey?"🧭 Follow the blue dots to the 🔒 finish.":"🧭 Follow the blue dots to the 🔑 key.";
+ setTimeout(clearHint,4500);
+}
+function mission(c){const a=[];a.push('🔑 find the key');a.push('🔒 carry it to the finish lock');if(c.traps)a.push('💣 '+c.traps+' traps');if(c.enemies)a.push('👻 '+c.enemies+' patrols');if(c.decoys)a.push('🚪 '+c.decoys+' false exits');if(c.fog)a.push('🌫️ fog radius '+c.fog);return LEVELS[level-1].name+' • '+a.join(' • ')}
+function updateStats(){$('levelText').textContent=level;$('livesText').textContent=lives;$('movesText').textContent=moves;$('coinsText').textContent=state.coins;$('scoreText').textContent=state.score;$('comboText').textContent='x'+combo}
+function updateBest(){$('bestText').textContent=state.best[level]?Number(state.best[level]).toFixed(2)+'s':'—';$('bestScoreText').textContent=state.bestScore[level]??'—'}
+function updateFog(){const f=LEVELS[level-1].fog;if(!f){els.fog.classList.add('hidden');return}els.fog.classList.remove('hidden');const size=grid.length;els.fog.style.setProperty('--fx',((x+.5)/size*100)+'%');els.fog.style.setProperty('--fy',((y+.5)/size*100)+'%');}
+function startClock(){clearInterval(timer);const limit=LEVELS[level-1].time;timer=setInterval(()=>{if(paused||finished)return;seconds+=.1;$('timeText').textContent=seconds.toFixed(1);$('timeBar').style.width=Math.max(0,100-seconds/limit*100)+'%';if(seconds>=limit){finished=true;clearInterval(timer);$('message').textContent='⏰ Time up! Restarting Level 1…';setTimeout(()=>resetToLevel1(),650)}},100)}
+function ghostNextStep(gx,gy,tx,ty){
+ const q=[{x:gx,y:gy}], prev=new Map(), seen=new Set([gx+','+gy]);
+ while(q.length){
+  const cur=q.shift();
+  if(cur.x===tx&&cur.y===ty)break;
+  const dirs=[[1,0],[-1,0],[0,1],[0,-1]].sort(()=>Math.random()-.5);
+  for(const [dx,dy] of dirs){
+   const nx=cur.x+dx, ny=cur.y+dy, k=nx+','+ny;
+   if(nx<0||ny<0||ny>=grid.length||nx>=grid.length||grid[ny][nx]!==0||seen.has(k))continue;
+   seen.add(k); prev.set(k,cur); q.push({x:nx,y:ny});
+  }
+ }
+ const target=tx+','+ty;
+ if(!seen.has(target))return {x:gx,y:gy};
+ let cur={x:tx,y:ty};
+ while(prev.has(cur.x+','+cur.y)){
+  const parent=prev.get(cur.x+','+cur.y);
+  if(parent.x===gx&&parent.y===gy)return cur;
+  cur=parent;
+ }
+ return {x:gx,y:gy};
+}
+
+function startEnemies(){
+ clearInterval(enemyTimer);
+ if(!items.enemies.length)return;
+ enemyTimer=setInterval(()=>{
+  if(paused||finished)return;
+  items.enemies.forEach(e=>{
+   const p=e.path[e.pos];
+   if(!p)return;
+   const next=ghostNextStep(p.x,p.y,x,y);
+   let idx=e.path.findIndex(a=>a.x===next.x&&a.y===next.y);
+   if(idx<0){e.path.push(next);idx=e.path.length-1;}
+   e.pos=idx;
+  });
+  renderEnemies();
+  if(items.enemies.some(e=>{const p=e.path[e.pos];return p&&p.x===x&&p.y===y}))hitHazard('👻 Ghost caught you!',true);
+ },700);
+}
+function renderEnemies(){els.maze.querySelectorAll('.enemy').forEach(e=>e.remove());const size=grid.length;items.enemies.forEach((e,i)=>{const p=e.path[e.pos],d=cellEl('enemy',p,i%2?'👾':'👻')});updateFog()}
+function move(dx,dy){if(finished||paused)return;const nx=x+dx,ny=y+dy;if(nx<0||ny<0||ny>=grid.length||nx>=grid.length)return;moves++;$('movesText').textContent=moves;const k=nx+','+ny;
+ if(grid[ny][nx]===1&&!items.secrets.has(k)){lives--;combo=1;scoreAdd(-20);updateStats();$('message').textContent='💥 Wall hit! '+lives+' lives left.';if(lives<=0)resetToLevel1();return}
+ x=nx;y=ny;clearHint();renderPlayer();$('player').classList.add('walking');setTimeout(()=>$('player').classList.remove('walking'),160);
+ if(items.secrets.has(k)&&!items.opened.has(k)){items.opened.add(k);const c=[...els.maze.querySelectorAll('.secret-wall')].find(e=>e.dataset.x===String(x)&&e.dataset.y===String(y));if(c){c.classList.remove('wall','secret-wall');c.classList.add('floor','secret-open')}scoreAdd(50);$('message').textContent='🧩 Secret passage discovered! +50'}
+ if(items.key&&x===items.key.x&&y===items.key.y&&!hasKey){hasKey=true;$('goal').textContent='🔒';$('goal').classList.add('locked');$('goal').classList.remove('unlocked');renderPlayer();scoreAdd(150);$('message').textContent='🔑 Key collected! Carry it to the finish lock. +150'}
+ const ti=items.traps.findIndex(p=>p.x===x&&p.y===y);if(ti>=0){items.traps.splice(ti,1);els.maze.querySelectorAll('.trap').forEach(e=>{if(Number(e.dataset.x)===x&&Number(e.dataset.y)===y)e.remove()});hitHazard('💣 Trap triggered!');return}
+ const ci=items.coins.findIndex(p=>p.x===x&&p.y===y);if(ci>=0){items.coins.splice(ci,1);els.maze.querySelectorAll('.coin').forEach(e=>{if(Number(e.dataset.x)===x&&Number(e.dataset.y)===y)e.remove()});combo=Math.min(9,combo+1);state.coins++;scoreAdd(20*combo);$('message').textContent='🪙 Coin collected! +'+20*combo;updateStats()}
+ if(items.decoys.some(p=>p.x===x&&p.y===y)){scoreAdd(-50);respawn();$('message').textContent='🚪 False exit! -50 score. Keep searching.';return}
+ if(x===goal.x&&y===goal.y){
+  if(!hasKey){respawn();$('message').textContent='🔒 Locked! You need the key to open the finish.';return}
+  finished=true;clearInterval(timer);clearInterval(enemyTimer);
+  $('goal').textContent='🔓';$('goal').classList.remove('locked');$('goal').classList.add('unlocked');
+  $('message').textContent='🔓 Lock opened! Escape complete!';
+  setTimeout(finishLevel,450);
+  return;
+}
+ updateFog();
+}
+function respawn(){x=1;y=1;renderPlayer();updateFog()}
+function hitHazard(msg,ghost=false){if(finished)return;if(ghost && Date.now()<invulnerableUntil)return;lives--;combo=1;scoreAdd(-60);updateStats();respawn();if(ghost){invulnerableUntil=Date.now()+1800;$('player').classList.add('player-safe');setTimeout(()=>{$('player').classList.remove('player-safe')},1800);$('message').textContent=msg+' ❤️ '+Math.max(lives,0)+' lives left — RUN! You are safe for 1.8s.';}else{$('message').textContent=msg+' ❤️ '+Math.max(lives,0)+' lives left.';}if(lives<=0)resetToLevel1()}
+function resetToLevel1(){finished=true;clearInterval(timer);clearInterval(enemyTimer);lives=3;setTimeout(()=>{level=1;buildLevel()},650)}
+function scoreAdd(v){state.score=Math.max(0,state.score+v);save();updateStats()}
+async function finishLevel(){
+  finished=true;clearInterval(timer);clearInterval(enemyTimer);
+  const gained=250+Math.max(0,Math.floor((LEVELS[level-1].time-seconds)*5))+combo*25;
+  scoreAdd(gained);
+  if(!state.best[level]||seconds<Number(state.best[level]))state.best[level]=seconds;
+  if(!state.bestScore[level]||state.score>Number(state.bestScore[level]))state.bestScore[level]=state.score;
+  if(level<12)state.unlocked=Math.max(state.unlocked,level+1);
+  save();updateLevelButtons();updateBest();
+  $('completeSummary').textContent='🌟 '+LEVELS[level-1].name+' cleared in '+seconds.toFixed(1)+' seconds.';
+  $('completeTime').textContent=seconds.toFixed(1)+'s';
+  $('completeScore').textContent='+'+gained;
+  $('phrase').textContent='🔐 Verifying completion…';
+  show('complete');
+  try{
+    const code=await claimPhrase();
+    $('phrase').textContent=code;
+  }catch(err){
+    console.error(err);
+    $('phrase').textContent='⚠️ Secure code could not be verified. Please restart this level.';
+  }
+}
+function updateLevelButtons(){['levels','levels2'].forEach(id=>{const box=$(id);if(!box)return;box.innerHTML='';for(let i=1;i<=12;i++){const b=document.createElement('button');b.className='level-btn'+(i===level?' current':'')+(i>state.unlocked?' locked':'');b.textContent=i>state.unlocked?'🔒':i;b.disabled=i>state.unlocked;if(i<=state.unlocked)b.onclick=()=>{level=i;show('game');buildLevel()};box.appendChild(b)}});$('homeCoins').textContent=state.coins;$('homeScore').textContent=state.score}
+function nextLevel(){
+  if(level>=12){
+    $('finalCode').textContent=lastClaimedCode||'⚠️ Secure final code unavailable.';
+    $('finalScore').textContent=state.score;
+    show('final');
+    return;
+  }
+  level++;show('game');buildLevel();
+}
+function goHome(){clearInterval(timer);clearInterval(enemyTimer);paused=false;$('pauseOverlay').classList.add('hidden');updateLevelButtons();show('home')}
+function togglePause(){if(finished||els.game.classList.contains('hidden'))return;paused=!paused;$('pauseOverlay').classList.toggle('hidden',!paused);$('pauseBtn').textContent=paused?'▶ Resume':'Ⅱ Pause'}
+$('playBtn').onclick=()=>{level=1;lives=3;show('game');buildLevel()};$('restartBtn').onclick=()=>{if(!els.game.classList.contains('hidden'))buildLevel()};$('restartBtn2').onclick=()=>buildLevel();$('hintBtn').onclick=showHint;$('homeBtn').onclick=goHome;$('completeHomeBtn').onclick=goHome;$('finalHomeBtn').onclick=goHome;$('nextBtn').onclick=nextLevel;$('pauseBtn').onclick=togglePause;$('resumeBtn').onclick=togglePause;
+document.querySelectorAll('.control').forEach(b=>b.addEventListener('pointerdown',e=>{e.preventDefault();const m=b.dataset.move;if(m==='up')move(0,-1);if(m==='down')move(0,1);if(m==='left')move(-1,0);if(m==='right')move(1,0)}));
+document.addEventListener('keydown',e=>{if(els.game.classList.contains('hidden'))return;const k=e.key.toLowerCase();if(['arrowup','arrowdown','arrowleft','arrowright','w','a','s','d'].includes(k)){e.preventDefault();if(k==='arrowup'||k==='w')move(0,-1);if(k==='arrowdown'||k==='s')move(0,1);if(k==='arrowleft'||k==='a')move(-1,0);if(k==='arrowright'||k==='d')move(1,0)}if(k==='p')togglePause();if(k==='r')buildLevel()});
+updateLevelButtons();show('home');
+})();
+</script>
+</body>
+</html>
