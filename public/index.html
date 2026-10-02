@@ -276,14 +276,27 @@ function nextLevel(){
   }
   level++;
 
+let moved = false;
+
+function continueToNextLevel() {
+    if (moved) return;
+    moved = true;
+
+    show('game');
+    buildLevel();
+}
+
 adBreak({
     type: 'next',
     name: 'level-transition',
     adBreakDone: () => {
-        show('game');
-        buildLevel();
+        continueToNextLevel();
     }
 });
+
+setTimeout(() => {
+    continueToNextLevel();
+}, 5000);
 }
 function goHome(){clearInterval(timer);clearInterval(enemyTimer);paused=false;$('pauseOverlay').classList.add('hidden');updateLevelButtons();show('home')}
 function togglePause(){if(finished||els.game.classList.contains('hidden'))return;paused=!paused;$('pauseOverlay').classList.toggle('hidden',!paused);$('pauseBtn').textContent=paused?'▶ Resume':'Ⅱ Pause'}
