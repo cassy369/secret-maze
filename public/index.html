@@ -1,5 +1,8 @@
 <!DOCTYPE html>
 <html lang="en">
+<head>
+<script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-2998415975860859" crossorigin="anonymous"></script>
+<script>window.adsbygoogle = window.adsbygoogle || []; var adBreak = adConfig = function(o) {adsbygoogle.push(o);} </script>
 <meta name="google-adsense-account" content="ca-pub-2998415975860859">
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no">
@@ -271,7 +274,16 @@ function nextLevel(){
     show('final');
     return;
   }
-  level++;show('game');buildLevel();
+  level++;
+
+adBreak({
+    type: 'next',
+    name: 'level-transition',
+    adBreakDone: () => {
+        show('game');
+        buildLevel();
+    }
+});
 }
 function goHome(){clearInterval(timer);clearInterval(enemyTimer);paused=false;$('pauseOverlay').classList.add('hidden');updateLevelButtons();show('home')}
 function togglePause(){if(finished||els.game.classList.contains('hidden'))return;paused=!paused;$('pauseOverlay').classList.toggle('hidden',!paused);$('pauseBtn').textContent=paused?'▶ Resume':'Ⅱ Pause'}
