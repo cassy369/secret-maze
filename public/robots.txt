@@ -1,0 +1,3 @@
+User-agent: *
+Allow: /
+Sitemap: https://secret-maze.onrender.com/sitemap.xml
